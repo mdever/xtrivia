@@ -1,0 +1,13 @@
+[{
+    "name": "local",
+    "type": "sqlite",
+    "database": "./db/trivia.db",
+    "entities": [
+        "entity/**/*.ts"
+    ],
+    "logging": true,
+    "migrations": ["migrations/*.ts"],
+    "cli": {
+        "migrationsDir": "./migrations"
+    }
+}]

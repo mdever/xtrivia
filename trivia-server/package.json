@@ -1,0 +1,27 @@
+{
+  "name": "trivia-server",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "build": "RMDIR /S /Q dist && tsc && XCOPY /E /H public dist\\public\\",
+    "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
+    "dev": "node_modules\\.bin\\tsc-watch.cmd --onSuccess \"SET ENV=local; node dist/app.js\""
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "morgan": "~1.9.1",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.2.41"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^16.11.12",
+    "sqlite3": "^5.0.2",
+    "ts-node": "^10.4.0",
+    "tsc-watch": "^4.5.0",
+    "typescript": "^4.5.3"
+  }
+}
