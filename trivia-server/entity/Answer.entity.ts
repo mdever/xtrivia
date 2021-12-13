@@ -1,8 +1,10 @@
 import { Entity, ManyToOne, Column } from 'typeorm';
-import { BaseEntity } from './BaseEntity';
-import { Question } from './Question';
+import { BaseEntity } from './BaseEntity.entity';
+import { Question } from './Question.entity';
 
-@Entity()
+@Entity({
+    name: 'answers'
+})
 export class Answer extends BaseEntity {
 
     @Column()

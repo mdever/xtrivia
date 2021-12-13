@@ -1,9 +1,11 @@
 import { Entity, Column, OneToMany, ManyToOne, OneToOne } from 'typeorm';
-import { Answer } from './Answer';
-import { BaseEntity } from './BaseEntity';
-import { Game } from './Game';
+import { Answer } from './Answer.entity';
+import { BaseEntity } from './BaseEntity.entity';
+import { Game } from './Game.entity';
 
-@Entity()
+@Entity({
+    name: 'games'
+})
 export class Question extends BaseEntity {
 
     @Column()

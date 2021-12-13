@@ -3,7 +3,7 @@
     "type": "sqlite",
     "database": "./db/trivia.db",
     "entities": [
-        "entity/**/*.ts"
+        "dist/**/*.entity.js"
     ],
     "logging": true,
     "migrations": ["migrations/*.ts"],

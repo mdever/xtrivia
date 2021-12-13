@@ -10,4 +10,9 @@ export function getConnection(): Connection {
     return db;
 }
 
-export * from './User';
+export * from './Answer.entity';
+export * from './BaseEntity.entity';
+export * from './Game.entity';
+export * from './Question.entity';
+export * from './Session.entity';
+export * from './User.entity';

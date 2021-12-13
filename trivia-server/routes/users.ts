@@ -1,8 +1,8 @@
-var express = require('express');
+import { getConnection, User } from '../entity';
+import express, { Request, Response } from 'express';
+
 var router = express.Router();
 
-import { getConnection, User } from '../entity';
-import { Request, Response } from 'express';
 
 /* GET users listing. */
 router.get('/', async function(req: Request, res: Response, next: any) {

@@ -4,17 +4,16 @@ import http from 'http';
 import process from 'process';
 import 'reflect-metadata';
 import { createConnection } from 'typeorm';
-import { User } from './entity/User';
+import { User } from './entity/User.entity';
 import { setConnection } from './entity';
+import sessionsRouter from './routes/sessions';
 
-const env = process.env.env || 'local';
-
-const dbpath = "db/trivia.db";
-const port = normalizePort(process.env.PORT || '8080');
 const debug = require('debug')('trivia-server:server');
-
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+
+const env = process.env.env || 'local';
+const port = normalizePort(process.env.PORT || '8080');
 
 var app = express();
 
@@ -32,11 +31,12 @@ createConnection(env).then(conn => {
     app.use(cookieParser());
     app.use(express.static(path.join(__dirname, 'public')));
 
-    var indexRouter = require('./routes/index');
-    var usersRouter = require('./routes/users');
+    const indexRouter = require('./routes/index');
+    const usersRouter = require('./routes/users');
 
     app.use('/', indexRouter);
     app.use('/users', usersRouter);
+    app.use('/sessions', sessionsRouter);
 
     module.exports = app;
 
