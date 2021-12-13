@@ -1,4 +1,4 @@
-import { PrimaryGeneratedColumn, Column, AfterInsert, AfterUpdate } from 'typeorm';
+import { PrimaryGeneratedColumn, Column, BeforeInsert, BeforeUpdate } from 'typeorm';
 
 export class BaseEntity {
 
@@ -8,15 +8,17 @@ export class BaseEntity {
     @Column()
     createdAt: Date
 
-    @Column()
-    updatedAt: Date
+    @Column({
+        nullable: true
+    })
+    updatedAt: Date | null;
 
-    @AfterInsert()
+    @BeforeInsert()
     setCreatedAt() {
         this.createdAt = new Date();
     }
 
-    @AfterUpdate()
+    @BeforeUpdate()
     setUpdatedAt() {
         this.updatedAt = new Date();
     }

@@ -13,5 +13,5 @@ export class Session extends BaseEntity {
     token: string;
 
     @Column()
-    expiresAt: string;
+    expiresAt: Date;
 }
