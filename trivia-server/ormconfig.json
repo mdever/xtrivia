@@ -8,6 +8,7 @@
     "logging": true,
     "migrations": ["migrations/*.ts"],
     "cli": {
-        "migrationsDir": "./migrations"
+        "migrationsDir": "./migrations",
+        "entitiesDir": "./entity"
     }
 }]

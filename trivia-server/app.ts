@@ -7,6 +7,7 @@ import { createConnection } from 'typeorm';
 import { User } from './entity/User.entity';
 import { setConnection } from './entity';
 import sessionsRouter from './routes/sessions';
+import gamesRouter from './routes/games';
 
 const debug = require('debug')('trivia-server:server');
 var cookieParser = require('cookie-parser');
@@ -37,6 +38,7 @@ createConnection(env).then(conn => {
     app.use('/', indexRouter);
     app.use('/users', usersRouter);
     app.use('/sessions', sessionsRouter);
+    app.use('/games', gamesRouter);
 
     module.exports = app;
 
