@@ -27,7 +27,8 @@ export const authenticate = async (req: Request, res: Response, next: any) => {
         const session = await sessionsRepository.findOne({
             where: {
                 token
-            }
+            },
+            relations: ['user']
         });
 
         if (!session) {

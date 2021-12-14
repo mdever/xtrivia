@@ -3,6 +3,7 @@ import { requiresFields } from '../middleware/validation';
 import { getConnection, Session, User } from '../entity';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import { authenticate } from '../middleware/auth';
 
 
 const debug = require('debug')('trivia-server:routes:sessions');
@@ -83,5 +84,31 @@ router.post('/', requiresFields(['username', 'password']), async (req: express.R
     res.end();
 
 });
+
+router.delete('/', authenticate, async (req: express.Request, res: express.Response) => {
+    const { username } = res.locals;
+
+    const sessionsRepository = getConnection().getRepository(Session);
+
+    const sessions = await sessionsRepository.find({
+        where: {
+            user: {
+                username
+            }
+        }
+    });
+
+    if (sessions && sessions.length === 0) {
+        res.status(200);
+        res.end();
+        return;
+    }
+
+    await sessionsRepository.delete(sessions.map(s => s.id));
+
+    res.status(200);
+    res.end();
+    return;
+})
 
 export default router;

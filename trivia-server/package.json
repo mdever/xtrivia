@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "build": "RMDIR /S /Q dist && tsc && XCOPY /E /H public dist\\public\\",
+    "buildnix": "rm -rf dist && tsc && cp -r public dist/public",
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
     "dev": "node_modules\\.bin\\tsc-watch.cmd --onSuccess \"SET ENV=local; node dist/app.js\""
   },
