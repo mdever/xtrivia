@@ -1,12 +1,13 @@
-import { getConnection } from '../entity';
+import { getConnection, User } from '../entity';
 import { Request, Response } from 'express';
 import { Session } from '../entity';
-const debug = require('debug')('trivia-server:middleware');
+const debug = require('debug')('trivia-server:middleware:auth');
 
 const PREFIX = 'Bearer ';
 
 export const authenticate = async (req: Request, res: Response, next: any) => {
     const sessionsRepository = getConnection().getRepository(Session);
+    const usersRepository = getConnection().getRepository(User);
 
     let authHeader = req.headers.authorization;
     if (!authHeader) {
@@ -27,8 +28,7 @@ export const authenticate = async (req: Request, res: Response, next: any) => {
         const session = await sessionsRepository.findOne({
             where: {
                 token
-            },
-            relations: ['user']
+            }
         });
 
         if (!session) {
@@ -56,8 +56,10 @@ export const authenticate = async (req: Request, res: Response, next: any) => {
             return;
         }
 
-        res.locals.username = session.user.username;
-        res.locals.userid   = session.user.id;
+        const user = await usersRepository.findOne(session.user.id);
+
+        res.locals.username = user.username;
+        res.locals.userid   = user.id;
         next();
 
     } catch (err) {

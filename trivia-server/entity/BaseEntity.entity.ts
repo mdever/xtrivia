@@ -2,9 +2,6 @@ import { PrimaryGeneratedColumn, Column, BeforeInsert, BeforeUpdate } from 'type
 
 export class BaseEntity {
 
-    @PrimaryGeneratedColumn()
-    id: number;
-
     @Column()
     createdAt: Date
 

@@ -86,16 +86,17 @@ router.post('/', requiresFields(['username', 'password']), async (req: express.R
 });
 
 router.delete('/', authenticate, async (req: express.Request, res: express.Response) => {
-    const { username } = res.locals;
+    const { username, userid } = res.locals;
 
     const sessionsRepository = getConnection().getRepository(Session);
 
     const sessions = await sessionsRepository.find({
         where: {
             user: {
-                username
+                id: userid
             }
-        }
+        },
+        relations: ['user']
     });
 
     if (sessions && sessions.length === 0) {

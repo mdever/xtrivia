@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, Column } from 'typeorm';
+import { Entity, ManyToOne, Column, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from './BaseEntity.entity';
 import { Question } from './Question.entity';
 
@@ -6,6 +6,9 @@ import { Question } from './Question.entity';
     name: 'answers'
 })
 export class Answer extends BaseEntity {
+
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column()
     text: string;
