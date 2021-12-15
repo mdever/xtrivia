@@ -2,11 +2,11 @@
     "name": "local",
     "type": "sqlite",
     "database": "./db/trivia.db",
-    "entities": [
-        "dist/**/*.entity.js"
-    ],
     "logging": true,
     "migrations": ["migrations/*.ts"],
+    "entities": [
+        "dist/entity/*.entity.js"
+    ],
     "cli": {
         "migrationsDir": "./migrations",
         "entitiesDir": "./entity"

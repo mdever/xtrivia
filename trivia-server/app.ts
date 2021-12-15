@@ -3,9 +3,9 @@ import path from 'path';
 import http from 'http';
 import process from 'process';
 import 'reflect-metadata';
-import { createConnection } from 'typeorm';
+import { createConnection, getConnectionOptions } from 'typeorm';
 import { User } from './entity/User.entity';
-import { setConnection } from './entity';
+import { Answer, Game, Question, Session, setConnection } from './entity';
 import sessionsRouter from './routes/sessions';
 import gamesRouter from './routes/games';
 
@@ -22,8 +22,12 @@ var app = express();
  * Create HTTP server.
  */
 const server = http.createServer(app);
-
-createConnection(env).then(conn => {
+getConnectionOptions(env).then(options => {
+  const theOptions = {
+    ...options,
+    entities: [Answer, Game, Question, Session, User]
+  }
+  createConnection(env).then(conn => {
     setConnection(conn);
 
     app.use(logger('dev'));
@@ -51,6 +55,7 @@ createConnection(env).then(conn => {
     server.listen(port);
     server.on('error', onError);
     server.on('listening', onListening);
+  })
 })
 
 /**

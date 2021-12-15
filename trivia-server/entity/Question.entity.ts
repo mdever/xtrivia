@@ -4,7 +4,7 @@ import { BaseEntity } from './BaseEntity.entity';
 import { Game } from './Game.entity';
 
 @Entity({
-    name: 'games'
+    name: 'questions'
 })
 export class Question extends BaseEntity {
 

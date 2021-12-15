@@ -48,7 +48,7 @@ function validateQuestions(questions: any): string | null {
         if (!question.text) {
             validationErrors.push('question.text should be a string');
         }
-        if (!question.number) {
+        if (!question.index) {
             validationErrors.push('question.index should be a number');
         }
 
