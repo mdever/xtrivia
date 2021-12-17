@@ -6,6 +6,19 @@ import { Question } from './Question.entity';
 @Entity({name: 'games'})
 export class Game extends BaseEntity {
 
+    static toDTO(game: Game): object {
+        let tempGame: any = {
+            ...game
+        };
+
+        let { owner, ...cleanGame } = tempGame;
+        
+
+        cleanGame['ownerId'] = game.owner.id;
+
+        return JSON.parse(JSON.stringify(cleanGame));
+    }
+
     @PrimaryGeneratedColumn()
     id: number;
 

@@ -1,4 +1,4 @@
-import { getConnection, User } from '../entity';
+import { Game, getConnection, Question, User } from '../entity';
 import { Request, Response } from 'express';
 import { Session } from '../entity';
 const debug = require('debug')('trivia-server:middleware:auth');
@@ -69,4 +69,64 @@ export const authenticate = async (req: Request, res: Response, next: any) => {
         res.end();
         return;
     }
-}
+};
+
+export const authorizeUserOwnsGame = (key: string) => {
+    return async (req: Request, res: Response, next: any) => {
+        const { username, userid } = res.locals;
+        const gameId = req.params[key];
+
+        const userRepository = getConnection().getRepository(User);
+        const gameRepository = getConnection().getRepository(Game);
+        
+        const user = await userRepository.findOne(userid);
+        const game = await gameRepository.findOne(gameId, {
+            relations: ['owner']
+        });
+
+        if (user.id !== game.owner.id) {
+            res.status(403);
+            res.send({
+                error: {
+                    userMessage: 'Unauthorized',
+                    developerMessage: `User ID ${userid} is unauthorized to access game id ${gameId}`,
+                    code: 403
+                }
+            });
+            res.end();
+            return;
+        }
+
+        next();
+    };
+};
+
+export const authorizeUserOwnsQuestion = (key: string) => {
+    return async (req: Request, res: Response, next: any) => {
+        const { username, userid } = res.locals;
+        const questionId = req.params[key];
+
+        const userRepository = getConnection().getRepository(User);
+        const questionRepository = getConnection().getRepository(Question);
+        
+        const user = await userRepository.findOne(userid);
+        const question = await questionRepository.findOne(questionId, {
+            relations: ['game', 'game.owner']
+        });
+
+        if (user.id !== question.game.owner.id) {
+            res.status(403);
+            res.send({
+                error: {
+                    userMessage: 'Unauthorized',
+                    developerMessage: `User ID ${userid} is unauthorized to access question id ${questionId}`,
+                    code: 403
+                }
+            });
+            res.end();
+            return;
+        }
+
+        next();
+    };
+};

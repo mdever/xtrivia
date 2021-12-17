@@ -18,7 +18,7 @@ function validateAnswers(answers: any): string | null {
             validationErrors.push('answer.text should be a string');
         }
 
-        if (!answer.index) {
+        if (!answer.index && answer.index !== 0) {
             validationErrors.push('answer.index should be a number');
         }
 
@@ -48,7 +48,7 @@ function validateQuestions(questions: any): string | null {
         if (!question.text) {
             validationErrors.push('question.text should be a string');
         }
-        if (!question.index) {
+        if (!question.index && question.index !== 0) {
             validationErrors.push('question.index should be a number');
         }
 
@@ -99,7 +99,7 @@ router.post('/', authenticate, requiresFields(["name"]), async (req: express.Req
     game = await gameRepository.save(game);
     if (questions) {
         for (const questionDTO of questions) {
-            let question: Question;
+            let question = new Question();
             question.text = questionDTO.text;
             question.hint = questionDTO.hint;
             question.index = questionDTO.index;
@@ -125,11 +125,54 @@ router.post('/', authenticate, requiresFields(["name"]), async (req: express.Req
     game = await gameRepository.findOne(game.id);
 
     res.status(201);
-    res.send(game.toString());
+    res.send(JSON.stringify(game));
     res.end();
     return;
-    
 });
+
+router.get('/:gameId', authenticate, async (req: express.Request, res: express.Response) => {
+    const { username, userid } = res.locals;
+    const { gameId } = req.params;
+    
+    const userRepository = getConnection().getRepository(User);
+    const gameRepository = getConnection().getRepository(Game);
+
+    const user = await userRepository.findOne(userid);
+    const game = await gameRepository.findOne(gameId, {
+        relations: ['owner', 'questions', 'questions.answers']
+    });
+
+    if (!game) {
+        res.status(404);
+        res.send({
+            error: {
+                userMessage: 'Game not found',
+                developerMessage: `No game of ID ${gameId} found for user ${username}`,
+                code: 404
+            }
+        })
+        res.end();
+        return;
+    }
+
+    if (user.id !== game.owner.id) {
+        res.status(403);
+        res.send({
+            error: {
+                userMessage: 'Unauthorized',
+                developerMessage: `User ${username} is unauthorized to GET game ${gameId}`,
+                code: 403
+            }
+        });
+        res.end();
+        return;
+    }
+
+    res.status(200);
+    res.send(JSON.stringify(Game.toDTO(game)));
+    res.end();
+    return;
+})
 
 export default router;
 
