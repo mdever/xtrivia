@@ -4,7 +4,7 @@ import { requiresFields } from '../middleware/validation';
 import bcrypt from 'bcrypt';
 const debug = require('debug')('trivia-server:routes:users');
 
-var router = express.Router();
+const router = express.Router();
 
 
 /* GET users listing. */
@@ -104,4 +104,4 @@ router.post('/', requiresFields(['username', 'password', 'email']), async (req: 
   });
 });
 
-module.exports = router;
+export default router;

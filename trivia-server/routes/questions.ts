@@ -1,8 +1,10 @@
 import express from 'express';
 import { requiresFields } from '../middleware/validation';
-import { authenticate, authorizeUserOwnsGame } from '../middleware/auth';
-import { getConnection } from 'typeorm';
+import { authenticate, authorizeUserOwnsGame, authorizeUserOwnsQuestion } from '../middleware/auth';
+import { getConnection } from '../entity';
 import { User, Game, Question } from '../entity';
+
+const debug = require('debug')('trivia-server:routes:questions');
 
 const router = express.Router();
 
@@ -58,13 +60,12 @@ router.post('/:gameId', authenticate, authorizeUserOwnsGame('gameId'), requiresF
     return;
 })
 
-router.get('/:gameId/questions', authenticate, authorizeUserOwnsGame('gameId'), async (req, res) => {
+router.get('/games/:gameId/questions', authenticate, authorizeUserOwnsGame('gameId'), async (req, res) => {
     const { username, userid } = res.locals;
     const { gameId } = req.params;
 
     const userRepository = getConnection().getRepository(User);
     const gameRepository = getConnection().getRepository(Game);
-    const questionRepository = getConnection().getRepository(Question);
 
     const user = await userRepository.findOne(userid);
     const game = await gameRepository.findOne(gameId, {
@@ -72,13 +73,43 @@ router.get('/:gameId/questions', authenticate, authorizeUserOwnsGame('gameId'), 
     });
 
     res.status(200);
-    res.send({
+    res.send([
         ...game.questions
-    });
+    ]);
     res.end();
     return;
 });
 
 router.get('/questions/:questionId', authenticate, authorizeUserOwnsQuestion('questionId'), async (req, res) => {
+    const { questionId } = req.params;
+    const questionRepo = getConnection().getRepository(Question);
+    const { withAnswers } = req.query;
+    let question;
+    if (withAnswers) {
+        question = questionRepo.findOne(questionId);
+    } else {
+        question = questionRepo.findOne(questionId, {
+            relations: ['answers']
+        });
+    }
 
+
+    if (!question) {
+        res.status(404);
+        res.send({
+            error: {
+                userMessage: 'No question found',
+                developerMessage: `No question with ID ${questionId} found`,
+                code: 404
+            }
+        });
+        res.end();
+        return;
+    }
+
+    return {
+        ...question
+    }
 })
+
+export default router;

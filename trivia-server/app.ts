@@ -4,10 +4,16 @@ import http from 'http';
 import process from 'process';
 import 'reflect-metadata';
 import { createConnection, getConnectionOptions } from 'typeorm';
+import ws from 'ws';
 import { User } from './entity/User.entity';
 import { Answer, Game, Question, Session, setConnection } from './entity';
+import usersRouter from './routes/users';
 import sessionsRouter from './routes/sessions';
 import gamesRouter from './routes/games';
+import answersRouter from './routes/answers';
+import questionsRouter from './routes/questions';
+import roomsRouter from './routes/rooms';
+import ticketsRouter from './routes/tickets';
 
 const debug = require('debug')('trivia-server:server');
 var cookieParser = require('cookie-parser');
@@ -18,6 +24,11 @@ const port = normalizePort(process.env.PORT || '8080');
 
 var app = express();
 
+const wsServer = new ws.Server({ noServer: true });
+wsServer.on('connection', socket => {
+    socket.on('message', message => console.log(message));
+})
+
 /**
  * Create HTTP server.
  */
@@ -27,7 +38,7 @@ getConnectionOptions(env).then(options => {
     ...options,
     entities: [Answer, Game, Question, Session, User]
   }
-  createConnection(env).then(conn => {
+  createConnection(options).then(conn => {
     setConnection(conn);
 
     app.use(logger('dev'));
@@ -43,10 +54,20 @@ getConnectionOptions(env).then(options => {
     app.use('/users', usersRouter);
     app.use('/sessions', sessionsRouter);
     app.use('/games', gamesRouter);
-
-    module.exports = app;
+    app.use('/', questionsRouter);
+    app.use('/', answersRouter);
+    app.use('/', roomsRouter);
+    app.use('/', ticketsRouter);
 
     app.set('port', port);
+
+    server.on('upgrade', (request, socket, head) => {
+        wsServer.handleUpgrade(request, socket, head, socket => {
+            wsServer.emit('connection', socket, request);
+        })
+    })
+
+    module.exports = app;
 
     /**
      * Listen on provided port, on all network interfaces.

@@ -5,7 +5,6 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { authenticate } from '../middleware/auth';
 
-
 const debug = require('debug')('trivia-server:routes:sessions');
 
 let router = express.Router();

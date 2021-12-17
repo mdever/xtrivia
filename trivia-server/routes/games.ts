@@ -131,6 +131,7 @@ router.post('/', authenticate, requiresFields(["name"]), async (req: express.Req
 });
 
 router.get('/:gameId', authenticate, async (req: express.Request, res: express.Response) => {
+    const { denmormalize } = req.query;
     const { username, userid } = res.locals;
     const { gameId } = req.params;
     
