@@ -130,6 +130,26 @@ router.post('/', authenticate, requiresFields(["name"]), async (req: express.Req
     return;
 });
 
+router.get('/', authenticate, async (req: express.Request, res: express.Response) => {
+    const { username, userid } = res.locals;
+
+    const gameRepo = getConnection().getRepository(Game);
+    const games = await gameRepo.find({
+        where: {
+            owner: {
+                id: userid
+            }
+        }
+    });
+
+    res.status(200);
+    res.send([
+        ...games
+    ]);
+    res.end();
+    return;
+});
+
 router.get('/:gameId', authenticate, async (req: express.Request, res: express.Response) => {
     const { denmormalize } = req.query;
     const { username, userid } = res.locals;

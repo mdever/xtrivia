@@ -7,6 +7,7 @@ import { createConnection, getConnectionOptions } from 'typeorm';
 import ws from 'ws';
 import { User } from './entity/User.entity';
 import { Answer, Game, Question, Session, setConnection } from './entity';
+import indexRouter from './routes/index';
 import usersRouter from './routes/users';
 import sessionsRouter from './routes/sessions';
 import gamesRouter from './routes/games';
@@ -46,9 +47,6 @@ getConnectionOptions(env).then(options => {
     app.use(express.urlencoded({ extended: false }));
     app.use(cookieParser());
     app.use(express.static(path.join(__dirname, 'public')));
-
-    const indexRouter = require('./routes/index');
-    const usersRouter = require('./routes/users');
 
     app.use('/', indexRouter);
     app.use('/users', usersRouter);
