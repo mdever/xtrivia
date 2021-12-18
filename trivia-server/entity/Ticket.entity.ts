@@ -1,4 +1,5 @@
-import { BaseEntity, BeforeInsert, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, BeforeInsert, Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Room } from "./Room.entity";
 import { User } from "./User.entity";
 
 @Entity()
@@ -11,8 +12,15 @@ export class Ticket extends BaseEntity {
     @JoinColumn()
     user: User;
 
+    @ManyToOne(type => Room, room => room.tickets)
+    @JoinColumn()
+    room: Room;
+
     @Column()
     expires: Date;
+
+    @Column()
+    ticket: string;
 
     @BeforeInsert()
     setExpires() {

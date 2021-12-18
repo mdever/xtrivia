@@ -7,7 +7,6 @@ import { createConnection, getConnectionOptions } from 'typeorm';
 import ws from 'ws';
 import { User } from './entity/User.entity';
 import { Answer, Game, Question, Session, setConnection } from './entity';
-import indexRouter from './routes/index';
 import usersRouter from './routes/users';
 import sessionsRouter from './routes/sessions';
 import gamesRouter from './routes/games';
@@ -25,9 +24,24 @@ const port = normalizePort(process.env.PORT || '8080');
 
 var app = express();
 
+export type WsAuthFn = (msg: ws.RawData) => boolean;
+
 const wsServer = new ws.Server({ noServer: true });
 wsServer.on('connection', socket => {
-    socket.on('message', message => console.log(message));
+    const authListener: WsAuthFn = (msg: ws.RawData) => {
+      const msgStr = msg.toString();
+      const { ticket } = JSON.parse(msgStr);
+
+      return false;
+    }
+    socket.on('message', msg => {
+      const authorized = authListener(msg);
+      if (!authorized) {
+        socket.send(JSON.stringify({ authorized: false }));
+        socket.close();
+
+      }
+    });
 })
 
 /**
@@ -35,10 +49,6 @@ wsServer.on('connection', socket => {
  */
 const server = http.createServer(app);
 getConnectionOptions(env).then(options => {
-  const theOptions = {
-    ...options,
-    entities: [Answer, Game, Question, Session, User]
-  }
   createConnection(options).then(conn => {
     setConnection(conn);
 
@@ -47,6 +57,8 @@ getConnectionOptions(env).then(options => {
     app.use(express.urlencoded({ extended: false }));
     app.use(cookieParser());
     app.use(express.static(path.join(__dirname, 'public')));
+
+    const indexRouter = require('./routes/index');
 
     app.use('/', indexRouter);
     app.use('/users', usersRouter);
