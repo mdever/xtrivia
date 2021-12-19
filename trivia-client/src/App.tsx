@@ -5,6 +5,8 @@ import HomePage from './pages/HomePage';
 import { useContext, Fragment } from 'react';
 import { AppContext } from './context/app.context';
 import './App.css';
+import AppLayout from './layouts/App.layout';
+import UnauthHomePage from './pages/UnauthHomePage';
 
 function App() {
 
@@ -13,19 +15,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<App/>}>
-          <Routes>
-            <Route path="/">
-              <Fragment>
-                <div>App-&gt;Default</div>
-              </Fragment>
-            </Route>
-            <Route path="signup">
-              <Fragment>
-                <div>Sign Up</div>
-              </Fragment>
-            </Route>
-          </Routes>
+        <Route path="/" element={<AppLayout />}>
+          <Route index element={context.token ? <HomePage /> : <UnauthHomePage />} />
         </Route>
       </Routes>
     </Router>
