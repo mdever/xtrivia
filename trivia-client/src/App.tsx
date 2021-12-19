@@ -13,26 +13,19 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/">
-          <Fragment>
-            <div className="App">
-              <header className="App-header">
-                Global header
-              </header>
-              <Routes>
-                  <Route path="/">
-                    <Fragment>
-                      <div>App-&gt;Default</div>
-                    </Fragment>
-                  </Route>
-                  <Route path="signup">
-                    <Fragment>
-                      <div>Sign Up</div>
-                    </Fragment>
-                  </Route>
-              </Routes>   
-            </div>
-          </Fragment>
+        <Route path="/" element={<App/>}>
+          <Routes>
+            <Route path="/">
+              <Fragment>
+                <div>App-&gt;Default</div>
+              </Fragment>
+            </Route>
+            <Route path="signup">
+              <Fragment>
+                <div>Sign Up</div>
+              </Fragment>
+            </Route>
+          </Routes>
         </Route>
       </Routes>
     </Router>
