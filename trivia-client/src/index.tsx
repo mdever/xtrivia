@@ -2,11 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import { AppContext } from './context/app.context';
 import reportWebVitals from './reportWebVitals';
+
+const token = sessionStorage.getItem('token');
+const username = sessionStorage.getItem('username');
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <AppContext.Provider value={{ token, username }}> 
+      <App />
+    </AppContext.Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );
