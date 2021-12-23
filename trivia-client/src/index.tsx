@@ -10,9 +10,7 @@ const username = sessionStorage.getItem('username');
 
 ReactDOM.render(
   <React.StrictMode>
-    <AppContext.Provider value={{ token, username }}> 
-      <App />
-    </AppContext.Provider>
+    <App token={token} username={username}/>
   </React.StrictMode>,
   document.getElementById('root')
 );

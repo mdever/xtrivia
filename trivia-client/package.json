@@ -50,5 +50,6 @@
     "@craco/craco": "^6.4.3",
     "@types/axios": "^0.14.0",
     "@types/react-router": "^5.1.17"
-  }
+  },
+  "proxy": "http://localhost:8080"
 }
