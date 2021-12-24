@@ -7,7 +7,11 @@ module.exports = {
     container: {
       center: true
     },
-    extend: {},
+    extend: {
+      gridTemplateColumns: {
+        'layout': 'minmax(200px, 1fr) 3fr'
+      }
+    },
   },
   plugins: [],
 }
