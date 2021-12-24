@@ -3,13 +3,14 @@ import { useContext, useEffect, useState } from "react";
 import { Outlet } from "react-router";
 import { AppContext } from "../context/app.context";
 import { Game } from 'trivia-shared';
+import { Link } from "react-router-dom";
 
 export default function GamesLayout() {
     const context = useContext(AppContext);
     const [games, setGames] = useState<Game[]>([]);
 
     useEffect(() => {
-        axios.post('/games', {
+        axios.get('/games', {
             headers: {
                 'Authorization': `Bearer ${context.token}`
             }
@@ -24,18 +25,17 @@ export default function GamesLayout() {
 
     return (
         <div className="grid grid-cols-layout">
-            <div className="flex flex-column">
+            <div className="flex flex-col">
                 {
                     games.map(g => {
                         return (
-                            <div>{g.name}</div>
+                            <Link key={g.id} to={`${g.id}`} className="basis-6">{g.name}</Link>
                         );
                     })
                 }
-                <div>New Game</div>
+                <Link to="new">New</Link>
             </div>
             <div className="p-2">
-                Games Layout
                 <Outlet />
             </div>
         </div>

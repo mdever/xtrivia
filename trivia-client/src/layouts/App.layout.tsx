@@ -11,7 +11,7 @@ export default function AppLayout() {
     return (
         <div className="container font-mono">
             <header className="w-full min-h-30 pt-2">
-                <h3>XTrivia</h3>
+                <Link to="/"><h3>XTrivia</h3></Link>
                 {   context.token ? 
                     <Link to="logout" className="float-right">Logout</Link>
                     : <Link to="login" className="float-right">Login</Link>

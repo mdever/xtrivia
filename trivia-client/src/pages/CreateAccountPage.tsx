@@ -1,10 +1,9 @@
 import axios from 'axios';
-import { ChangeEvent, FormEvent, useContext, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext, TAppContext } from '../context/app.context';
 
 export default function CreateAccountPage() {
-    const context = useContext(AppContext);
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');

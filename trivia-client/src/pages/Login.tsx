@@ -1,10 +1,9 @@
 import axios from "axios";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import { AppContext, TAppContext } from "../context/app.context";
 
 export function Login() {
-    const context = useContext(AppContext);
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -48,7 +47,7 @@ export function Login() {
                                     <input type="password" className="border border-rounded" name="password" onChange={(e) => setPassword(e.target.value)}/>
                                 </form>
                             </div>
-                            <button onClick={() => login(context)} className="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Create Account</button>
+                            <button onClick={() => login(context)} className="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2">Login</button>
                         </div>
                     </div>
                 </div>
