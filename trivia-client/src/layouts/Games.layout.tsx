@@ -2,10 +2,11 @@ import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { Outlet } from "react-router";
 import { AppContext } from "../context/app.context";
+import { Game } from 'trivia-shared';
 
 export default function GamesLayout() {
     const context = useContext(AppContext);
-    const [games, setGames] = useState([]);
+    const [games, setGames] = useState<Game[]>([]);
 
     useEffect(() => {
         axios.post('/games', {

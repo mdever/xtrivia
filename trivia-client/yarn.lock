@@ -11375,6 +11375,10 @@
   dependencies:
     "punycode" "^2.1.1"
 
+"trivia-shared@file:../trivia-shared":
+  "resolved" "file:../trivia-shared"
+  "version" "1.0.0"
+
 "tryer@^1.0.1":
   "integrity" "sha512-c3zayb8/kWWpycWYg87P71E1S1ZL6b6IJxfb5fvsUgsf0S2MVGaDhDXXjDMpdCpfWXqptc+4mXwmiy1ypXqRAA=="
   "resolved" "https://registry.npmjs.org/tryer/-/tryer-1.0.1.tgz"
