@@ -1,7 +1,7 @@
-import { useParams } from "react-router"
+import { Outlet, useParams } from "react-router"
 import { Link } from "react-router-dom";
 
-export default function GameDetail () {
+export default function GameLayout () {
     const { id } = useParams();
     return (
         <div>
@@ -15,7 +15,8 @@ export default function GameDetail () {
                     </div>
                 </div>
                 <div className="p-2">
-                    Game Detail for Game {id}
+                    Game Layout for Game {id}
+                    <Outlet />
                 </div>
             </div>
         </div>

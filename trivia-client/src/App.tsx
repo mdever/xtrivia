@@ -8,12 +8,12 @@ import { Login } from './pages/Login';
 import CreateAccountPage from './pages/CreateAccountPage';
 import GamesLayout from './layouts/Games.layout';
 import GamesHistory from './pages/GamesHistory';
-import GameDetail from './pages/GameDetail';
+import GameLayout from './layouts/Game.layout';
 import NewGame from './pages/NewGame';
 import GameSummary from './pages/GameSummary';
-import QuestionLayout from './pages/QuestionLayout';
+import QuestionLayout from './layouts/Question.layout';
 import QuestionSummary from './pages/QuestionSummary';
-import AnswersLayout from './layouts/Answers.Layout';
+import AnswersLayout from './layouts/Answers.layout';
 import QuestionDetail from './pages/QuestionDetail';
 import AnswerDetail from './pages/AnswerDetail';
 
@@ -38,7 +38,7 @@ function App({username: pUsername, token: pToken}: {username: string | null, tok
             <Route path="games" element={<GamesLayout />}>
               <Route index element={<GamesHistory />} />
               <Route path="new" element={<NewGame />} />
-              <Route path=":gameId" element={<GameDetail />}>
+              <Route path=":gameId" element={<GameLayout />}>
                 <Route index element={<GameSummary />} />
                 <Route path="questions" element={<QuestionLayout />}>
                   <Route index element={<QuestionSummary />} />
