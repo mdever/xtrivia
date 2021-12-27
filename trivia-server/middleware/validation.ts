@@ -5,7 +5,7 @@ export const requiresFields = (fieldNames: string[]) => {
         const body = req.body;
         const missingFields = [];
         for (const field of fieldNames) {
-            if (!body[field]) {
+            if (body[field] === null || body[field] === undefined) {
                 missingFields.push(field);
             }
         }

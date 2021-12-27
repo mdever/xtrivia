@@ -25,15 +25,15 @@ export default function GamesLayout() {
 
     return (
         <div className="grid grid-cols-layout">
-            <div className="flex flex-col">
+            <div className="flex flex-col divide-y-2">
                 {
                     games.map(g => {
                         return (
-                            <Link key={g.id} to={`${g.id}`} className="basis-6">{g.name}</Link>
+                            <Link key={g.id} to={`${g.id}`} className="min-h-[5px]">{g.name}</Link>
                         );
                     })
                 }
-                <Link to="new">New</Link>
+                <Link to="new" className="min-h-[5px]">New</Link>
             </div>
             <div className="p-2">
                 <Outlet />

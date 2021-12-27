@@ -13,9 +13,11 @@ import NewGame from './pages/NewGame';
 import GameSummary from './pages/GameSummary';
 import QuestionLayout from './layouts/Question.layout';
 import QuestionSummary from './pages/QuestionSummary';
-import AnswersLayout from './layouts/Answers.layout';
 import QuestionDetail from './pages/QuestionDetail';
 import AnswerDetail from './pages/AnswerDetail';
+import NewQuestion from './pages/NewQuestion';
+import AnswersLayout from './layouts/Answers.layout';
+import { RecoilRoot } from 'recoil';
 
 function App({username: pUsername, token: pToken}: {username: string | null, token: string | null}) {
   const [username, setUsername] = useState(pUsername);
@@ -30,28 +32,31 @@ function App({username: pUsername, token: pToken}: {username: string | null, tok
   
   return (
     <AppContext.Provider value={context}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<AppLayout />}>
-            <Route index element={context.token ? <HomePage /> : <CreateAccountPage />} />
-            <Route path="login" element={<Login />} />
-            <Route path="games" element={<GamesLayout />}>
-              <Route index element={<GamesHistory />} />
-              <Route path="new" element={<NewGame />} />
-              <Route path=":gameId" element={<GameLayout />}>
-                <Route index element={<GameSummary />} />
-                <Route path="questions" element={<QuestionLayout />}>
-                  <Route index element={<QuestionSummary />} />
-                  <Route path=":questionId" element={<AnswersLayout />}>
-                    <Route index element={<QuestionDetail />} />
-                    <Route path=":answerId" element={<AnswerDetail />} />
+      <RecoilRoot>
+        <Router>
+          <Routes>
+            <Route path="/" element={<AppLayout />}>
+              <Route index element={context.token ? <HomePage /> : <CreateAccountPage />} />
+              <Route path="login" element={<Login />} />
+              <Route path="games" element={<GamesLayout />}>
+                <Route index element={<GamesHistory />} />
+                <Route path="new" element={<NewGame />} />
+                <Route path=":gameId" element={<GameLayout />}>
+                  <Route index element={<GameSummary />} />
+                  <Route path="questions" element={<QuestionLayout />}>
+                    <Route index element={<QuestionSummary />} />
+                    <Route path="new" element={<NewQuestion />} />
+                    <Route path=":questionId" element={<AnswersLayout />}>
+                      <Route index element={<QuestionDetail />} />
+                      <Route path=":answerId" element={<AnswerDetail />} />
+                    </Route>
                   </Route>
                 </Route>
-              </Route>
-            </Route> 
-          </Route>
-        </Routes>
-      </Router>
+              </Route> 
+            </Route>
+          </Routes>
+        </Router>
+      </RecoilRoot>
     </AppContext.Provider>
 
   );

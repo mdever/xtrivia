@@ -8,7 +8,7 @@ const debug = require('debug')('trivia-server:routes:questions');
 
 const router = express.Router();
 
-router.post('/:gameId', authenticate, authorizeUserOwnsGame('gameId'), requiresFields(["text", "index"]), async (req, res) => {
+router.post('/games/:gameId/questions', authenticate, authorizeUserOwnsGame('gameId'), requiresFields(["text", "index"]), async (req, res) => {
     const { username, userid } = res.locals;
     const { gameId } = req.params;
     const { index, text, hint, answers } = req.body;
@@ -18,8 +18,8 @@ router.post('/:gameId', authenticate, authorizeUserOwnsGame('gameId'), requiresF
     const questionRepository = getConnection().getRepository(Question);
 
     const user = await userRepository.findOne(userid);
-    const game = await gameRepository.findOne(gameId, {
-        relations: ['owner', 'answers']
+    let game = await gameRepository.findOne(gameId, {
+        relations: ['owner', 'questions', 'questions.answers']
     });
 
     if (!game) {
@@ -51,6 +51,7 @@ router.post('/:gameId', authenticate, authorizeUserOwnsGame('gameId'), requiresF
     question.hint = hint;
     question.answers = answers || []
     game.questions.push(question);
+    game = await gameRepository.save(game);
 
     res.status(201);
     res.send({
