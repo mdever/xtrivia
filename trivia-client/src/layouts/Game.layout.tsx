@@ -1,15 +1,15 @@
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { Outlet, useParams } from "react-router"
 import { Link } from "react-router-dom";
-import { DenormalizedGame, Game } from "trivia-shared";
+import { useRecoilState } from "recoil";
 import { AppContext } from "../context/app.context";
-import { GameContext } from "../context/game.context";
+import { gameState } from "../context/game.context";
 
 export default function GameLayout () {
     const { gameId } = useParams();
     const { token } = useContext(AppContext);
-    const [game, setGame] = useState<DenormalizedGame | null>(null);
+    const [game, setGame] = useRecoilState(gameState);
 
     useEffect(() => {
         axios.get(`/games/${gameId}`, {
@@ -26,22 +26,20 @@ export default function GameLayout () {
     }, [gameId]);
 
     return (
-        <GameContext.Provider value={game}>
-        <div className="grid grid-cols-layout">
-            <div className="flex flex-col divide-y-2">
-                {
-                    game?.questions?.map(q => {
-                        return (
-                            <Link key={q.id} to={`questions/${q.id}`} className="min-h-[5px]">{q.text}</Link>
-                        );
-                    })
-                }
-                <Link to="questions/new" className="min-h-[5px]">New</Link>
-            </div>
-            <div className="p-2">
-                <Outlet />
-            </div>
+    <div className="grid grid-cols-layout">
+        <div className="flex flex-col divide-y-2">
+            {
+                game?.questions?.map(q => {
+                    return (
+                        <Link key={q.id} to={`questions/${q.id}`} className="min-h-[5px]">{q.text}</Link>
+                    );
+                })
+            }
+            <Link to="questions/new" className="min-h-[5px]">New</Link>
         </div>
-        </GameContext.Provider>
+        <div className="p-2">
+            <Outlet />
+        </div>
+    </div>
     )
 }

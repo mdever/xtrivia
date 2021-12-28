@@ -1,6 +1,7 @@
-import { createContext } from "react";
-import { DenormalizedGame, Game } from "trivia-shared";
+import { atom } from "recoil";
+import { DenormalizedGame } from "trivia-shared";
 
-export type IGameContext = DenormalizedGame;
-
-export const GameContext = createContext<IGameContext | null>(null);
+export const gameState = atom<DenormalizedGame | null>({
+    key: 'gameState',
+    default: null
+});

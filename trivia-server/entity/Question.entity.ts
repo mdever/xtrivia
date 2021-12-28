@@ -26,7 +26,7 @@ export class Question extends BaseEntity {
     answers: Answer[];
 
     @ManyToOne(type => Game, game => game.questions, {
-        cascade: ['insert', 'update']
+        onDelete: 'CASCADE'
     })
     game: Game;
 }

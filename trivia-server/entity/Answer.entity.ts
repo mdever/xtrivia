@@ -19,8 +19,6 @@ export class Answer extends BaseEntity {
     @Column()
     correct: boolean
 
-    @ManyToOne(type => Question, question => question.answers, {
-        cascade: ['insert', 'update']
-    })
+    @ManyToOne(type => Question, question => question.answers)
     question: Question;
 }

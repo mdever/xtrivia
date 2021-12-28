@@ -35,9 +35,7 @@ router.post('/games/:gameId/questions/:questionId/answers', authenticate, author
     answer.index = index;
     answer.correct = correct;
     answer.question = question;
-    question.answers.push(answer);
     answer = await answerRepo.save(answer);
-    question = await questionRepo.save(question);
 
     res.status(201);
     res.send({

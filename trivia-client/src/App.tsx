@@ -18,6 +18,7 @@ import AnswerDetail from './pages/AnswerDetail';
 import NewQuestion from './pages/NewQuestion';
 import AnswersLayout from './layouts/Answers.layout';
 import { RecoilRoot } from 'recoil';
+import NewAnswer from './pages/NewAnswer';
 
 function App({username: pUsername, token: pToken}: {username: string | null, token: string | null}) {
   const [username, setUsername] = useState(pUsername);
@@ -48,6 +49,7 @@ function App({username: pUsername, token: pToken}: {username: string | null, tok
                     <Route path="new" element={<NewQuestion />} />
                     <Route path=":questionId" element={<AnswersLayout />}>
                       <Route index element={<QuestionDetail />} />
+                      <Route path="new" element={<NewAnswer />} />
                       <Route path=":answerId" element={<AnswerDetail />} />
                     </Route>
                   </Route>
