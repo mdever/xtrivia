@@ -1,7 +1,6 @@
 import { createMachine, assign, EventObject } from 'xstate';
 import { Observable } from 'rxjs';
-import { raise } from 'xstate/lib/actions';
-import { eventNames } from 'process';
+import WebSocket from 'ws';
 
 export function makeid(length: number): string {
     var result           = '';
@@ -14,14 +13,17 @@ export function makeid(length: number): string {
    return result;
 }
 
-export const wsConnections: { [key: string]: WebSocket } = {};
+const wsConnections: { [key: string]: WebSocket } = {};
+
+export function registerConnection(id: string, socket: WebSocket): void {
+    wsConnections[id] = socket;
+}
 
 export interface GameState {
     name: string;
     clients: {
         wsId: string,
         username: string,
-        events$: Observable<string>
     }[];
     questions: {
         id: number,
@@ -43,8 +45,9 @@ export interface ClientEvent {
 }
 
 export interface PlayerAddedEvent extends EventObject {
-    ws: WebSocket;
-    username: string
+    wsId: string;
+    username: string;
+    machine: any;
 }
 
 export interface SendQuestionEvent extends EventObject {
@@ -83,25 +86,20 @@ export const GameMachine = createMachine<GameState, GameEvent>({
                 'PLAYER_ADDED': {
                     target: 'awaiting-players',
                     actions: assign((context, event: PlayerAddedEvent) => {
-                        const id = makeid(10);
-                        wsConnections[id] = event.ws;
-                        const clientEvents$ = new Observable<string>(subscriber => {
-                            const username = event.username;
-                            wsConnections[id].onmessage = function(msg: MessageEvent<string>) {
-                                const message = JSON.parse(msg.data);
-                                const nextEvent = { username, ...message };
-                                console.log('WS client got event');
-                                console.log(JSON.stringify(nextEvent, null, 2));
-                                subscriber.next(nextEvent);
+                        const socket = wsConnections[event.wsId];
+                        const username = event.username;
+                        socket.on('message', (msg) => {
+                            debugger;
+                            const message = JSON.parse(msg.toString());
+                            const nextEvent = { username, ...message };
+                            console.log('WS client got event');
+                            console.log(JSON.stringify(nextEvent, null, 2));
+                            event.machine.send(nextEvent);
 
-                                return function unsubscribe() {
-                                    console.log(`Observable for ${event.username} has been unsubscribed`)
-                                }
-                            };
-                        })
+                        });
                         return {
                             ...context,
-                            clients: [...context.clients, { wsId: id, username: event.username, events$: clientEvents$ }],
+                            clients: [...context.clients, { wsId: event.wsId, username: event.username }],
                             score: { ...context.score, [event.username]: 0 }
                         }
                     })
@@ -141,6 +139,13 @@ export const GameMachine = createMachine<GameState, GameEvent>({
                         const correctAnswer = context.answers.filter(a => a.questionId === event.questionId).find(a => a.correct);
                         const correct = event.answerId === correctAnswer.id;
 
+                        console.log('Inside machine action and received answer from user ' + event.username);
+                        if (correct) {
+                            console.log('Answer is correct');
+                        } else {
+                            console.log('Answer is not correct');
+                        }
+                        
                         if (correct) {
                             return {
                                 ...context,
