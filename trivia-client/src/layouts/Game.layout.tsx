@@ -27,6 +27,7 @@ export default function GameLayout () {
 
     return (
     <div className="grid grid-cols-layout">
+        <h3>Game {game?.id}</h3>
         <div className="flex flex-col divide-y-2">
             {
                 game?.questions?.map(q => {
