@@ -10,6 +10,10 @@ let machine = interpret(GameMachine.withContext({
             id: 0,
             text: 'How old am I?',
             hint: "It's not that hard",
+        },
+        {
+            id: 1,
+            text: 'What is my name?'
         }
     ],
     answers: [
@@ -24,8 +28,24 @@ let machine = interpret(GameMachine.withContext({
             id: 1,
             text: '32',
             correct: true
+        },
+        {
+            questionId: 1,
+            id: 0,
+            text: 'Mark',
+            correct: true
+        },
+        {
+            questionId: 1,
+            id: 1,
+            text: 'Chris',
+            correct: false
         }
-    ]
+    ],
+    tiebreaker: {
+        text: 'How many bananas in a dozen',
+        hint: 'Don\'t overthink it'
+    }
 }));
 
 machine.start();
@@ -39,6 +59,7 @@ machine.onTransition((context, event) => {
     console.log(context.value);
     console.log('Score: ');
     console.log(JSON.stringify(context.context.score, null, 2));
+    console.log(`Round: ${context.context.round}`);
 })
 
 const server = new WebSocketServer({
@@ -72,6 +93,9 @@ ws1.on('message', (msg) => {
             questionId: 0,
             answerId: 1
         }));
+    } else if (m.type === 'REVEAL_ANSWER') {
+        console.log('ws1 has had  answer revealed');
+        console.log(JSON.stringify(m, null, 2));
     }
 });
 
@@ -92,6 +116,9 @@ ws2.on('message', (msg) => {
             questionId: 0,
             answerId: 0
         }));
+    } else if (m.type === 'REVEAL_ANSWER') {
+        console.log('ws2 has had  answer revealed');
+        console.log(JSON.stringify(m, null, 2));
     }
 })
 ws2.on('open', () => {
@@ -111,6 +138,9 @@ ws3.on('message', (msg) => {
             questionId: 0,
             answerId: 1
         }));
+    } else if (m.type === 'REVEAL_ANSWER') {
+        console.log('ws3 has had  answer revealed');
+        console.log(JSON.stringify(m, null, 2));
     }
 });
 ws3.on('open', () => {
@@ -129,10 +159,24 @@ setTimeout(() => {
         });
 
         setTimeout(() => {
-            ws1.close();
-            ws2.close();
-            ws3.close();
-            server.close();
+            machine.send('REVEAL_ANSWER');
+
+            setTimeout(() => {
+
+                machine.send('SEND_QUESTION');
+
+                setTimeout(() => {
+
+                    machine.send('REVEAL_ANSWER');
+
+                    setTimeout(() => {
+                        ws1.close();
+                        ws2.close();
+                        ws3.close();
+                        server.close();
+                    }, 2000);
+                }, 2000);
+            });
         }, 2000);
     }, 2000);
 }, 2000)

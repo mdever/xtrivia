@@ -37,7 +37,16 @@ export interface GameState {
         questionId: number;
     }[],
     round: number;
-    score: { [username: string]: number }
+    score: { [username: string]: number },
+    tiebreaker?: {
+        text: string,
+        hint?: string
+    },
+    tiebreakerResponses?: { 
+        username: string;
+        answer: string;
+        correct: boolean | null;
+    }[]
 }
 
 export interface ClientEvent {
@@ -64,10 +73,20 @@ export interface RevealAnswerEvent extends EventObject {
     answerId: number;
 }
 
+export interface TiebreakerResponseEvent extends EventObject, ClientEvent {
+    answer: string
+}
+
+export interface EvaluateTiebreakerResponseEvent extends EventObject, ClientEvent {
+    correct: boolean
+}
+
 export type GameEvent = PlayerAddedEvent
                       | SendQuestionEvent
                       | AnswerReceivedEvent
-                      | RevealAnswerEvent;
+                      | RevealAnswerEvent
+                      | TiebreakerResponseEvent
+                      | EvaluateTiebreakerResponseEvent;
 
 export const GameMachine = createMachine<GameState, GameEvent>({
     id: 'game-machine',
@@ -136,7 +155,8 @@ export const GameMachine = createMachine<GameState, GameEvent>({
                 'ANSWER_RECEIVED': {
                     target: 'awaiting-answers',
                     actions: assign((context, event: AnswerReceivedEvent) => {
-                        const correctAnswer = context.answers.filter(a => a.questionId === event.questionId).find(a => a.correct);
+                        const questionId = context.round;
+                        const correctAnswer = context.answers.filter(a => a.questionId === questionId).find(a => a.correct);
                         const correct = event.answerId === correctAnswer.id;
 
                         console.log('Inside machine action and received answer from user ' + event.username);
@@ -167,47 +187,159 @@ export const GameMachine = createMachine<GameState, GameEvent>({
                             return context.round === context.questions.length - 1;
                         },
                         actions: [
+                            (context, event: RevealAnswerEvent) => {
+                                const question = context.questions.find(q => q.id === context.round - 1);
+                                const correctAnswer = context.answers.filter(a => a.questionId === question.id).find(a => a.correct);
+                                context.clients.forEach(c => {
+                                    const ws = wsConnections[c.wsId];
+                                    ws.send(JSON.stringify({
+                                        type: 'REVEAL_ANSWER',
+                                        questionId: question.id,
+                                        answerId: correctAnswer.id
+                                    }))
+                                })
+                            },
                             assign((context, event: RevealAnswerEvent) => {
                               return {
                                   ...context,
                                   round: context.round+1
                               }
-                            }),
-                            (context, event: RevealAnswerEvent) => {
-                                context.clients.forEach(c => {
-                                    const ws = wsConnections[c.wsId];
-                                    ws.send(JSON.stringify({
-                                        type: 'REVEAL_ANSWER',
-                                        questionId: event.questionId,
-                                        answerId: event.answerId
-                                    }))
-                                })
-                            }
+                            })
                         ],
-                        target: 'game-done'
+                        target: 'tie-or-game-done'
                     },
                     {
                         actions: [
+                            (context, event: RevealAnswerEvent) => {
+                                const question = context.questions.find(q => q.id === context.round);
+                                const correctAnswer = context.answers.filter(a => a.questionId === question.id).find(a => a.correct);
+                                context.clients.forEach(c => {
+                                    const ws = wsConnections[c.wsId];
+                                    ws.send(JSON.stringify({
+                                        type: 'REVEAL_ANSWER',
+                                        questionId: question.id,
+                                        answerId: correctAnswer.id
+                                    }))
+                                })
+                            },
                             assign((context, event: RevealAnswerEvent) => {
                               return {
                                   ...context,
                                   round: context.round+1
                               }
-                            }),
-                            (context, event: RevealAnswerEvent) => {
-                                context.clients.forEach(c => {
-                                    const ws = wsConnections[c.wsId];
-                                    ws.send(JSON.stringify({
-                                        type: 'REVEAL_ANSWER',
-                                        questionId: event.questionId,
-                                        answerId: event.answerId
-                                    }))
-                                })
-                            }
+                            })
                         ],
                         target: 'awaiting-question'
                     }
                 ],
+            }
+        },
+        'tie-or-game-done': {
+            always: [
+                {
+                    cond: (context, event) => {
+                        const maxScorePlayer = Object.keys(context.score).reduce((highest, next) => {
+                            if (highest === null) {
+                                return next
+                            }
+
+                            if (context.score[next] > context.score[highest]) {
+                                return next;
+                            } else {
+                                return highest;
+                            }
+                        }, null);
+
+                        const highestScore = context.score[maxScorePlayer];
+                        const tiedPlayers = [];
+                        Object.keys(context.score).forEach(playerName => {
+                            if (context.score[playerName] === highestScore) {
+                                tiedPlayers.push({ username: playerName, score: context.score[playerName]})
+                            }
+                        });
+
+                        if (tiedPlayers.length > 1 && context.tiebreaker) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    },
+                    target: 'tie'
+                }, {
+                    target: 'game-done'
+                }
+            ]
+        },
+        'tie': {
+            on: {
+                'SEND_TIEBREAKER': {
+                    actions: (context, event) => {
+                        context.clients.forEach(({ wsId }) => {
+                            const socket = wsConnections[wsId];
+                            socket.send(JSON.stringify({
+                                type: 'TIEBREAKER',
+                                text: context.tiebreaker.text,
+                                hint: context.tiebreaker.hint
+                            }));
+                        })
+                    },
+                    target: 'awaiting-tiebreaker-response'
+                }
+            }
+        },
+        'awaiting-tiebreaker-response': {
+            on: {
+                'TIEBREAKER_RESPONSE': {
+                    actions: assign((context, event: TiebreakerResponseEvent) => {
+                        return {
+                            ...context,
+                            tiebreakerResponses: [
+                                ...context.tiebreakerResponses,
+                                { 
+                                    username: event.username,
+                                    answer: event.answer,
+                                    correct: null
+                                }
+                            ]
+                        }
+                    }),
+                    target: 'awaiting-tiebreaker-response'
+                },
+                'EVALUATE_TIEBREAKER_RESPONSE': {
+                    actions: assign((context, event: EvaluateTiebreakerResponseEvent) => {
+                        const response = context.tiebreakerResponses.find(r => r.username === event.username);
+                        const responseIdx = context.tiebreakerResponses.indexOf(response);
+                        const evaluatedResponse = {
+                            ...response,
+                            correct: event.correct
+                        };
+                        return {
+                            ...context,
+                            tiebreakerResponses: [
+                                ...context.tiebreakerResponses.slice(0, responseIdx), evaluatedResponse, ...context.tiebreakerResponses.slice(responseIdx+1)
+                            ]
+                        }
+                    }),
+                    target: 'awaiting-tiebreaker-response'
+                },
+                'DONE_EVALUATING': {
+                    target: 'game-done',
+                    actions: assign((context, event) => {
+                        const newScores = { ...context.score };
+                        for (const response of context.tiebreakerResponses) {
+                            if (response.correct) {
+                                newScores[response.username] += 1;
+                            }
+                        }
+
+                        return {
+                            ...context,
+                            score: {
+                                ...newScores
+                            }
+                        }
+                    })
+                }
             }
         },
         'game-done': {
