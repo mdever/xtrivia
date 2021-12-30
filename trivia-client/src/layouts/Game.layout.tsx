@@ -26,21 +26,6 @@ export default function GameLayout () {
     }, [gameId]);
 
     return (
-    <div className="grid grid-cols-layout">
-        <h3>Game {game?.id}</h3>
-        <div className="flex flex-col divide-y-2">
-            {
-                game?.questions?.map(q => {
-                    return (
-                        <Link key={q.id} to={`questions/${q.id}`} className="min-h-[5px]">{q.text}</Link>
-                    );
-                })
-            }
-            <Link to="questions/new" className="min-h-[5px]">New</Link>
-        </div>
-        <div className="p-2">
-            <Outlet />
-        </div>
-    </div>
+        <Outlet />
     )
 }

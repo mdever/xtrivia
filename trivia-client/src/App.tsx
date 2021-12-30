@@ -17,6 +17,7 @@ import QuestionDetail from './pages/QuestionDetail';
 import AnswerDetail from './pages/AnswerDetail';
 import NewQuestion from './pages/NewQuestion';
 import AnswersLayout from './layouts/Answers.layout';
+import QuestionsLayout from './layouts/Questions.layout';
 import { RecoilRoot } from 'recoil';
 import NewAnswer from './pages/NewAnswer';
 
@@ -44,7 +45,7 @@ function App({username: pUsername, token: pToken}: {username: string | null, tok
                 <Route path="new" element={<NewGame />} />
                 <Route path=":gameId" element={<GameLayout />}>
                   <Route index element={<GameSummary />} />
-                  <Route path="questions" element={<QuestionLayout />}>
+                  <Route path="questions" element={<QuestionsLayout />}>
                     <Route index element={<QuestionSummary />} />
                     <Route path="new" element={<NewQuestion />} />
                     <Route path=":questionId" element={<AnswersLayout />}>

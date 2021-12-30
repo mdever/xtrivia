@@ -170,11 +170,17 @@ setTimeout(() => {
                     machine.send('REVEAL_ANSWER');
 
                     setTimeout(() => {
-                        ws1.close();
-                        ws2.close();
-                        ws3.close();
-                        server.close();
+                        
+                        machine.send('SEND_TIEBREAKER');
+
+                        setTimeout(() => {
+                            ws1.close();
+                            ws2.close();
+                            ws3.close();
+                            server.close();
+                        }, 2000);
                     }, 2000);
+
                 }, 2000);
             });
         }, 2000);

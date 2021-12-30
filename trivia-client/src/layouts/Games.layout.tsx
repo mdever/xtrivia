@@ -29,11 +29,11 @@ export default function GamesLayout() {
                 {
                     games.map(g => {
                         return (
-                            <Link key={g.id} to={`${g.id}`} className="min-h-[5px]">{g.name}</Link>
+                            <Link key={g.id} to={`${g.id}`} className="min-h-4">{g.name}</Link>
                         );
                     })
                 }
-                <Link to="new" className="min-h-[5px]">New</Link>
+                <Link to="new" className="min-h-4">New</Link>
             </div>
             <div className="p-2">
                 <Outlet />
