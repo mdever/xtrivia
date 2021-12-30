@@ -22,6 +22,7 @@ export default function QuestionLayout() {
             setQuestion(null);
         })
     }, [questionId])
+
     return (
         <div>
             <div>

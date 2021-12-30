@@ -196,7 +196,7 @@ export const GameMachine = createMachine<GameState, GameEvent>({
                                         type: 'REVEAL_ANSWER',
                                         questionId: question.id,
                                         answerId: correctAnswer.id
-                                    }))
+                                    }));
                                 })
                             },
                             assign((context, event: RevealAnswerEvent) => {
