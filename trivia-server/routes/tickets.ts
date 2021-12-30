@@ -8,6 +8,10 @@ const debug = require('debug')('trivia-server:routes:tickets');
 
 const router = express.Router();
 
+export function createTicket(): string {
+    return crypto.randomBytes(64).toString('hex');
+}
+
 router.post('/:roomId', authenticate, async (req: express.Request, res: express.Response) => {
     const { username, userid } = res.locals;
     const { roomId } = req.params;
@@ -36,12 +40,13 @@ router.post('/:roomId', authenticate, async (req: express.Request, res: express.
         return;
     }
 
-    const ticketVal = crypto.randomBytes(64).toString('hex');
+    const ticketVal = createTicket();
 
     let ticket = new Ticket();
     ticket.user = user;
     ticket.room = room;
     ticket.ticket = ticketVal;
+    ticket.owner = false;
     room.tickets.push(ticket);
     room.game = room.game;
 

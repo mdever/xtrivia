@@ -26,8 +26,8 @@ export default function GameSummary() {
     }, [gameId]);
 
     function startGame() {
-        axios.post('/rooms', {
-            gameId
+        axios.post(`/games/${gameId}/rooms`, {
+            name: game?.name
         }, {
             headers: {
                 'Authorization': `Bearer ${token}`

@@ -2,7 +2,8 @@ import express from 'express';
 import { requiresFields } from '../middleware/validation';
 import { authenticate, authorizeUserOwnsGame } from '../middleware/auth';
 import { applicationJson } from '../middleware';
-import { getConnection, User, Room, Game } from '../entity';
+import { getConnection, User, Room, Game, Ticket } from '../entity';
+import { createTicket } from './tickets';
 
 const debug = require('debug')('trivia-server:routes:rooms');
 
@@ -35,7 +36,12 @@ router.post('/games/:gameId/rooms', authenticate, authorizeUserOwnsGame('gameId'
     let room = new Room();
     room.name = name;
     room.game = game;
-    room.tickets = [];
+    const ticket = new Ticket();
+    ticket.ticket = createTicket();
+    ticket.owner = true;
+    ticket.user = user;
+    ticket.room = room;
+    room.tickets = [ticket];
 
     room = await roomRepo.save(room);
 

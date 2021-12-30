@@ -22,6 +22,9 @@ export class Ticket extends BaseEntity {
     @Column()
     ticket: string;
 
+    @Column()
+    owner: boolean;
+
     @BeforeInsert()
     setExpires() {
         let expiration = new Date();
