@@ -14,7 +14,9 @@ export class Question extends BaseEntity {
     @Column()
     text: string;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     hint?: string;
     
     @Column()

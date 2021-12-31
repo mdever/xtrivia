@@ -65,17 +65,17 @@ router.get('/games/:gameId/questions', authenticate, authorizeUserOwnsGame('game
     const { username, userid } = res.locals;
     const { gameId } = req.params;
 
-    const userRepository = getConnection().getRepository(User);
     const gameRepository = getConnection().getRepository(Game);
 
-    const user = await userRepository.findOne(userid);
     const game = await gameRepository.findOne(gameId, {
         relations: ['questions']
     });
 
+    const questions = game.questions.sort((q1, q2) => q1.index - q2.index);
+
     res.status(200);
     res.send([
-        ...game.questions
+        ...questions
     ]);
     res.end();
     return;

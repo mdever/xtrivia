@@ -68,7 +68,7 @@ router.get('/games/:gameId/questions/:questionId/answers', authenticate, authori
         return;
     }
 
-    const answers = question.answers;
+    const answers = question.answers.sort((a1, a2) => a1.index - a2.index);
 
     res.status(200);
     res.send([
