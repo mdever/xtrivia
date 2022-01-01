@@ -1,32 +1,26 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { Outlet, useParams } from "react-router";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { DenormalizedQuestion } from "trivia-shared";
 import { AppContext } from "../context/app.context";
+import { chosenQuestion, chosenQuestionId } from "../context/game.context";
 
 export default function QuestionLayout() {
     const { gameId, questionId } = useParams();
-    const [question, setQuestion] = useState<DenormalizedQuestion | null>(null);
+    const [qId, setChosenQuestionId] = useRecoilState(chosenQuestionId);
+    const question = useRecoilValue(chosenQuestion);
 
     const { token } = useContext(AppContext);
 
     useEffect(() => {
-        axios.get(`/games/${gameId}/questions/${questionId}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        }).then(res => {
-
-        }).catch(err => {
-            console.log('Could not fetch question');
-            setQuestion(null);
-        })
+        setChosenQuestionId(parseInt(questionId || '0'));
     }, [questionId])
 
     return (
         <div>
             <div>
-                Question outlet {question?.text}
+                Question outlet: {question?.text}
             </div>
             <Outlet />
         </div>

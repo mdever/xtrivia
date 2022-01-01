@@ -19,7 +19,10 @@ router.post('/games/:gameId/rooms', authenticate, authorizeUserOwnsGame('gameId'
     const gameRepo = getConnection().getRepository(Game);
 
     const user = await userRepo.findOne(userid);
-    const game = await gameRepo.findOne(gameId);
+    const game = await gameRepo.findOne(gameId, {
+        relations: ['questions', 'questions.answers']
+    });
+
     if (!game) {
         res.status(404);
         res.send({

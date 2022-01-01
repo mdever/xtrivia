@@ -155,7 +155,8 @@ setTimeout(() => {
 
     setTimeout(() => {
         machine.send({
-            type: 'SEND_QUESTION'
+            type: 'SEND_QUESTION',
+            owner: true
         });
 
         setTimeout(() => {

@@ -21,6 +21,10 @@ export function registerConnection(id: string, socket: WebSocket): void {
 
 export interface GameState {
     name: string;
+    owner?: {
+        wsId: string,
+        username: string
+    };
     clients: {
         wsId: string,
         username: string,
@@ -53,13 +57,23 @@ export interface ClientEvent {
     username: string;
 }
 
+export interface OwnerJoinedEvent extends EventObject {
+    wsId: string;
+    username: string;
+    machine: any;
+}
+
 export interface PlayerAddedEvent extends EventObject {
     wsId: string;
     username: string;
     machine: any;
 }
 
-export interface SendQuestionEvent extends EventObject {
+export interface OwnerEvent {
+    owner: boolean;
+}
+
+export interface SendQuestionEvent extends EventObject, OwnerEvent {
     type: 'SEND_QUESTION'
 }
 
@@ -81,7 +95,8 @@ export interface EvaluateTiebreakerResponseEvent extends EventObject, ClientEven
     correct: boolean
 }
 
-export type GameEvent = PlayerAddedEvent
+export type GameEvent = OwnerJoinedEvent
+                      | PlayerAddedEvent
                       | SendQuestionEvent
                       | AnswerReceivedEvent
                       | RevealAnswerEvent
@@ -90,7 +105,7 @@ export type GameEvent = PlayerAddedEvent
 
 export const GameMachine = createMachine<GameState, GameEvent>({
     id: 'game-machine',
-    initial: 'awaiting-players',
+    initial: 'awaiting-owner',
     context: {
         name: 'default',
         clients: [],
@@ -100,6 +115,32 @@ export const GameMachine = createMachine<GameState, GameEvent>({
         score: {}
     },
     states: {
+        'awaiting-owner': {
+            on: {
+                'OWNER_JOINED': {
+                    target: 'awaiting-players',
+                    actions: assign((context, event: OwnerJoinedEvent) => {
+                        const socket = wsConnections[event.wsId];
+                        const username = event.username;
+                        socket.on('message', (msg) => {
+                            const message = JSON.parse(msg.toString());
+                            const nextEvent = { username, owner: true, ...message };
+                            console.log('WS client got event');
+                            console.log(JSON.stringify(nextEvent, null, 2));
+                            event.machine.send(nextEvent);
+                        });
+
+                        return {
+                            ...context,
+                            owner: {
+                                wsId: event.wsId,
+                                username: event.username
+                            }
+                        }
+                    })
+                }
+            }
+        },
         'awaiting-players': {
             on: {
                 'PLAYER_ADDED': {

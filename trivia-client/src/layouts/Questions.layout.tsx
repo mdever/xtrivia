@@ -2,28 +2,16 @@ import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { useParams, Outlet } from "react-router";
 import { Link } from 'react-router-dom';
+import { useRecoilValue } from "recoil";
 import { DenormalizedGame, DenormalizedQuestion } from "trivia-shared";
 import { AppContext } from "../context/app.context";
+import { questionsForChosenGame } from "../context/game.context";
 
 export default function QuestionsLayout() {
 
     const { gameId } = useParams();
     const { token }  = useContext(AppContext);
-    const [questions, setQuestions] = useState<DenormalizedQuestion[]>()
-
-    useEffect(() => {
-        axios.get(`/games/${gameId}/questions`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        }).then(res => {
-            setQuestions(res.data);
-        }).catch(err => {
-            console.log('Could not fetch game ' + gameId);
-            console.log(err);
-            setQuestions([]);
-        })
-    }, [gameId])
+    const questions = useRecoilValue(questionsForChosenGame);
 
     return (
         <div className="grid grid-cols-layout">

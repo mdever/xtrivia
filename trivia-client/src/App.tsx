@@ -20,6 +20,7 @@ import AnswersLayout from './layouts/Answers.layout';
 import QuestionsLayout from './layouts/Questions.layout';
 import { RecoilRoot } from 'recoil';
 import NewAnswer from './pages/NewAnswer';
+import AnswersSummary from './pages/AnswersSummary';
 
 function App({username: pUsername, token: pToken}: {username: string | null, token: string | null}) {
   const [username, setUsername] = useState(pUsername);
@@ -48,10 +49,13 @@ function App({username: pUsername, token: pToken}: {username: string | null, tok
                   <Route path="questions" element={<QuestionsLayout />}>
                     <Route index element={<QuestionSummary />} />
                     <Route path="new" element={<NewQuestion />} />
-                    <Route path=":questionId" element={<AnswersLayout />}>
+                    <Route path=":questionId" element={<QuestionLayout />}>
                       <Route index element={<QuestionDetail />} />
-                      <Route path="new" element={<NewAnswer />} />
-                      <Route path=":answerId" element={<AnswerDetail />} />
+                      <Route path="answers" element={<AnswersLayout />}>
+                        <Route index element={<AnswersSummary />} />
+                        <Route path="new" element={<NewAnswer />} />
+                        <Route path=":answerId" element={<AnswerDetail />} />
+                      </Route>
                     </Route>
                   </Route>
                 </Route>
