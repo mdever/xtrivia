@@ -1,5 +1,4 @@
 import { createMachine, assign, EventObject } from 'xstate';
-import { Observable } from 'rxjs';
 import WebSocket from 'ws';
 
 export function makeid(length: number): string {

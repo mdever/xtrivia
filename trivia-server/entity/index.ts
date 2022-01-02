@@ -18,3 +18,4 @@ export * from './Session.entity';
 export * from './User.entity';
 export * from './Room.entity';
 export * from './Ticket.entity';
+export * from './GameHistory.entity';

@@ -15,6 +15,9 @@ export class Room extends BaseEntity {
     @Column()
     name: string;
 
+    @Column()
+    code: string;
+
     @OneToOne(() => Game)
     @JoinColumn()
     game: Game;
