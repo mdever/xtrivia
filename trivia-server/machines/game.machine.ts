@@ -410,4 +410,4 @@ export const GameMachine = createMachine<GameState, GameEvent>({
             }
         }
     }
-})
+});

@@ -4,10 +4,28 @@ import { authenticate, authorizeUserOwnsGame } from '../middleware/auth';
 import { applicationJson } from '../middleware';
 import { getConnection, User, Room, Game, Ticket } from '../entity';
 import { createTicket } from './tickets';
+import { createMachine, interpret, Interpreter, StateMachine } from 'xstate';
+import { GameEvent, GameMachine, GameState } from '../machines/game.machine';
 
 const debug = require('debug')('trivia-server:routes:rooms');
 
 const router = express.Router();
+
+const rooms: { [code: string]: Interpreter<GameState, any, GameEvent>} = { };
+
+export function addRoom(code: string, context: Partial<GameState>) {
+    const service = interpret(GameMachine.withContext({
+        ...GameMachine.context,
+        ...context
+    }))
+
+    rooms[code] = service;
+    service.start();
+}
+
+export function getGame(code: string): null | Interpreter<GameState, any, GameEvent> {
+    return rooms[code];
+}
 
 router.post('/games/:gameId/rooms', authenticate, authorizeUserOwnsGame('gameId'), requiresFields(['name']), async (req: express.Request, res: express.Response) => {
     const { gameId } = req.params;

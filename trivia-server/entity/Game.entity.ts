@@ -2,6 +2,7 @@ import { Entity, OneToMany, ManyToOne, Column, PrimaryGeneratedColumn } from 'ty
 import { User } from './User.entity';
 import { BaseEntity } from './BaseEntity.entity';
 import { Question } from './Question.entity';
+import { GameHistory } from './GameHistory.entity';
 
 @Entity({name: 'games'})
 export class Game extends BaseEntity {
@@ -35,4 +36,6 @@ export class Game extends BaseEntity {
     })
     questions: Question[];
 
+    @OneToMany(type => GameHistory, history => history.game)
+    histories: GameHistory[];
 }

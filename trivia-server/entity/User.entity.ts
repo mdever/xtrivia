@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from './BaseEntity.entity';
 import { Game } from './Game.entity';
+import { GameHistory } from './GameHistory.entity';
 import { Session } from './Session.entity';
 
 @Entity({name: 'users'})
@@ -25,4 +26,7 @@ export class User extends BaseEntity {
 
     @Column()
     salt: string;
+
+    @OneToMany(type => GameHistory, history => history.winner)
+    gamesWon: GameHistory[];
 }
