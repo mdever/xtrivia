@@ -5,7 +5,8 @@ import { applicationJson } from '../middleware';
 import { getConnection, User, Room, Game, Ticket, GameHistory } from '../entity';
 import { createTicket } from './tickets';
 import { createMachine, interpret, Interpreter, StateMachine } from 'xstate';
-import { GameEvent, GameMachine, GameState, makeid } from '../machines/game.machine';
+import { GameEvent, GameMachine, GameState, makeid, registerConnection } from '../machines/game.machine';
+import WebSocket from 'ws';
 
 const debug = require('debug')('trivia-server:routes:rooms');
 
@@ -25,6 +26,50 @@ export function createRoom(code: string, context: Partial<GameState>) {
 
 export function getGame(code: string): null | Interpreter<GameState, any, GameEvent> {
     return rooms[code];
+}
+
+export async function redeemTicket(ticket: string): Promise<{ roomCode: string, owner: boolean, user: User } | null> {
+    const ticketRepo = getConnection().getRepository(Ticket);
+    const roomRepo = getConnection().getRepository(Room);
+
+    const dbTicket = await ticketRepo.findOne({
+        where: {
+            ticket
+        },
+        relations: ['room', 'user']
+    });
+
+    if (!ticket) {
+        return null;
+    } else {
+        return {
+            roomCode: dbTicket.room.code,
+            owner: dbTicket.owner,
+            user: dbTicket.user
+        };
+    }
+}
+
+export function connectToRoom(socket: WebSocket, code: string, user: User, owner: boolean) {
+    const wsId = makeid(5);
+    registerConnection(wsId, socket);
+    const gameMachine = getGame(code);
+
+    if (owner) {
+        gameMachine.send({
+            type: 'OWNER_JOINED',
+            wsId,
+            username: user.username,
+            machine: gameMachine
+        });
+    } else {
+        gameMachine.send({
+            type: 'PLAYER_ADDED',
+            wsId,
+            username: user.username,
+            machine: gameMachine
+        });
+    }
 }
 
 router.post('/games/:gameId/rooms', authenticate, authorizeUserOwnsGame('gameId'), requiresFields(['name']), async (req: express.Request, res: express.Response) => {
