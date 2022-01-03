@@ -25,8 +25,6 @@ const port = normalizePort(process.env.PORT || '8080');
 
 var app = express();
 
-export type WsAuthFn = (msg: ws.RawData) => boolean;
-
 const wsServer = new WebSocketServer({ noServer: true });
 wsServer.on('connection', socket => {
 
@@ -40,7 +38,12 @@ wsServer.on('connection', socket => {
         return;
       }
       socket.removeAllListeners();
-      connectToRoom(socket, roomCode, user, owner);
+      if (connectToRoom(socket, roomCode, user, owner)) {
+        socket.send(JSON.stringify({ type: 'PLAYER_ADDED_SUCCESS' }));
+      } else {
+        socket.send(JSON.stringify({ type: 'PLAYER_ADDED_FAILURE' }));
+        socket.close();
+      }
     });
 })
 

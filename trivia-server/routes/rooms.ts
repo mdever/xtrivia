@@ -50,7 +50,7 @@ export async function redeemTicket(ticket: string): Promise<{ roomCode: string, 
     }
 }
 
-export function connectToRoom(socket: WebSocket, code: string, user: User, owner: boolean) {
+export function connectToRoom(socket: WebSocket, code: string, user: User, owner: boolean): boolean {
     const wsId = makeid(5);
     registerConnection(wsId, socket);
     const gameMachine = getGame(code);
@@ -70,6 +70,8 @@ export function connectToRoom(socket: WebSocket, code: string, user: User, owner
             machine: gameMachine
         });
     }
+
+    return true;
 }
 
 router.post('/games/:gameId/rooms', authenticate, authorizeUserOwnsGame('gameId'), requiresFields(['name']), async (req: express.Request, res: express.Response) => {
