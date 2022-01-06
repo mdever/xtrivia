@@ -39,3 +39,9 @@ export interface DenormalizedQuestion extends Question {
 export interface DenormalizedGame extends Game {
     questions: DenormalizedQuestion[];
 }
+
+export interface CreateRoomResponseDTO {
+    name: string;
+    code: string;
+    tickets: { ticket: string, code: string, owner: boolean }[];
+}
