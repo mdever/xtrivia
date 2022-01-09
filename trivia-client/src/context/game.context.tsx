@@ -6,6 +6,11 @@ export const gameState = atom<DenormalizedGame | null>({
     default: null
 });
 
+export const ticket = atom<string | null>({
+    key: 'ticket',
+    default: null
+});
+
 export const chosenQuestionId = atom<number | null>({
     key: 'chosenQuestionId',
     default: null

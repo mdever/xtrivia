@@ -21,6 +21,8 @@ import QuestionsLayout from './layouts/Questions.layout';
 import { RecoilRoot } from 'recoil';
 import NewAnswer from './pages/NewAnswer';
 import AnswersSummary from './pages/AnswersSummary';
+import HostRoom from './pages/HostRoom';
+import PlayerRoom from './pages/PlayerRoom';
 
 function App({username: pUsername, token: pToken}: {username: string | null, token: string | null}) {
   const [username, setUsername] = useState(pUsername);
@@ -59,7 +61,9 @@ function App({username: pUsername, token: pToken}: {username: string | null, tok
                     </Route>
                   </Route>
                 </Route>
-              </Route> 
+              </Route>
+              <Route path="host/:roomCode" element={<HostRoom />} />
+              <Route path="rooms/:roomCode" element={<PlayerRoom />} />
             </Route>
           </Routes>
         </Router>
